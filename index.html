@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spectre Analytica - Crime Risk Intelligence Dashboard</title>
+    <meta name="description" content="Advanced crime risk assessment and intelligence platform for South Africa. Real-time crime data analysis, 3D mapping, and route optimization.">
+    <meta name="keywords" content="crime analysis, risk assessment, south africa, security, intelligence, mapping">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="assets/css/main.css">
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Spectre Analytica - Crime Risk Intelligence">
+    <meta property="og:description" content="Engineering Tomorrow's Intelligence Today">
+    <meta property="og:image" content="assets/images/logo.png">
+    <meta property="og:type" content="website">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="assets/images/logo.png" alt="Spectre Analytica Logo" class="logo">
+                <div class="brand-text">
+                    <h1 class="brand-name">Spectre Analytica</h1>
+                    <p class="brand-tagline">Engineering Tomorrow's Intelligence Today</p>
+                </div>
+            </div>
+            
+            <nav class="navigation">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link active">
+                            <i data-lucide="bar-chart-3"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="crime-map.html" class="nav-link">
+                            <i data-lucide="map"></i>
+                            Crime Map
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="route-planning.html" class="nav-link">
+                            <i data-lucide="route"></i>
+                            Route Planning
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header mb-4">
+                <h2>Crime Risk Intelligence Dashboard</h2>
+                <p class="text-secondary">Real-time crime statistics and risk assessment for South Africa</p>
+                <div class="last-updated">
+                    <small class="text-muted">Last Updated: <span id="lastUpdated">Loading...</span></small>
+                </div>
+            </div>
+
+            <!-- Key Statistics -->
+            <div class="dashboard-grid">
+                <div class="card stat-card">
+                    <div class="card-header">
+                        <i data-lucide="alert-triangle" class="card-icon"></i>
+                        <h3 class="card-title">Total Incidents</h3>
+                    </div>
+                    <span class="stat-number" id="totalIncidents">12,547</span>
+                    <p class="stat-label">Past 30 Days</p>
+                    <div class="stat-change positive">
+                        <i data-lucide="trending-up"></i>
+                        +8.2% from last month
+                    </div>
+                </div>
+
+                <div class="card stat-card">
+                    <div class="card-header">
+                        <i data-lucide="shield-alert" class="card-icon"></i>
+                        <h3 class="card-title">High Risk Areas</h3>
+                    </div>
+                    <span class="stat-number" id="highRiskAreas">23</span>
+                    <p class="stat-label">Active Zones</p>
+                    <div class="stat-change negative">
+                        <i data-lucide="trending-down"></i>
+                        -2 from last week
+                    </div>
+                </div>
+
+                <div class="card stat-card">
+                    <div class="card-header">
+                        <i data-lucide="route" class="card-icon"></i>
+                        <h3 class="card-title">Safe Routes</h3>
+                    </div>
+                    <span class="stat-number" id="safeRoutes">1,834</span>
+                    <p class="stat-label">Calculated Today</p>
+                    <div class="stat-change positive">
+                        <i data-lucide="trending-up"></i>
+                        +15.3% efficiency
+                    </div>
+                </div>
+
+                <div class="card stat-card">
+                    <div class="card-header">
+                        <i data-lucide="users" class="card-icon"></i>
+                        <h3 class="card-title">Community Reports</h3>
+                    </div>
+                    <span class="stat-number" id="communityReports">456</span>
+                    <p class="stat-label">This Week</p>
+                    <div class="stat-change positive">
+                        <i data-lucide="trending-up"></i>
+                        +12.7% participation
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="dashboard-grid">
+                <!-- Crime Trends Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <i data-lucide="trending-up" class="card-icon"></i>
+                        <h3 class="card-title">Crime Trends (Last 30 Days)</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="crimeTrendsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Crime Categories Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <i data-lucide="pie-chart" class="card-icon"></i>
+                        <h3 class="card-title">Crime Categories</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="crimeCategoriesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Provincial Distribution -->
+            <div class="card">
+                <div class="card-header">
+                    <i data-lucide="map-pin" class="card-icon"></i>
+                    <h3 class="card-title">Provincial Crime Distribution</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="provincialChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Incidents Table -->
+            <div class="card">
+                <div class="card-header">
+                    <i data-lucide="list" class="card-icon"></i>
+                    <h3 class="card-title">Recent High-Priority Incidents</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Type</th>
+                                <th>Location</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentIncidents">
+                            <tr>
+                                <td>14:32</td>
+                                <td>Armed Robbery</td>
+                                <td>Johannesburg CBD</td>
+                                <td><span class="badge badge-danger">High</span></td>
+                                <td><span class="badge badge-warning">Investigating</span></td>
+                            </tr>
+                            <tr>
+                                <td>13:45</td>
+                                <td>Carjacking</td>
+                                <td>Sandton</td>
+                                <td><span class="badge badge-danger">High</span></td>
+                                <td><span class="badge badge-success">Resolved</span></td>
+                            </tr>
+                            <tr>
+                                <td>12:18</td>
+                                <td>Assault</td>
+                                <td>Cape Town CBD</td>
+                                <td><span class="badge badge-warning">Medium</span></td>
+                                <td><span class="badge badge-info">Reported</span></td>
+                            </tr>
+                            <tr>
+                                <td>11:55</td>
+                                <td>Theft</td>
+                                <td>Durban Central</td>
+                                <td><span class="badge badge-info">Low</span></td>
+                                <td><span class="badge badge-success">Resolved</span></td>
+                            </tr>
+                            <tr>
+                                <td>10:30</td>
+                                <td>Kidnapping</td>
+                                <td>Hillbrow</td>
+                                <td><span class="badge badge-danger">Critical</span></td>
+                                <td><span class="badge badge-danger">Active</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <i data-lucide="zap" class="card-icon"></i>
+                        <h3 class="card-title">Quick Actions</h3>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="crime-map.html" class="btn btn-primary mb-2">
+                            <i data-lucide="map"></i>
+                            View Crime Map
+                        </a>
+                        <a href="route-planning.html" class="btn btn-secondary mb-2">
+                            <i data-lucide="route"></i>
+                            Plan Safe Route
+                        </a>
+                        <button class="btn btn-outline mb-2" onclick="generateReport()">
+                            <i data-lucide="file-text"></i>
+                            Generate Report
+                        </button>
+                        <button class="btn btn-success" onclick="refreshData()">
+                            <i data-lucide="refresh-cw"></i>
+                            Refresh Data
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i data-lucide="bell" class="card-icon"></i>
+                        <h3 class="card-title">Recent Alerts</h3>
+                    </div>
+                    <div class="alerts-list">
+                        <div class="alert alert-danger">
+                            <strong>High Risk Alert:</strong> Increased criminal activity detected in Hillbrow area.
+                        </div>
+                        <div class="alert alert-warning">
+                            <strong>Route Advisory:</strong> M1 North experiencing security incidents.
+                        </div>
+                        <div class="alert alert-info">
+                            <strong>System Update:</strong> Crime database updated with latest SAPS data.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="assets/js/dashboard.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+        
+        // Update timestamp
+        document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+        });
+    </script>
+
+    <style>
+        /* Additional Dashboard Styles */
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .last-updated {
+            margin-top: 0.5rem;
+        }
+
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .badge-warning {
+            background-color: var(--warning-color);
+            color: var(--bg-primary);
+        }
+
+        .badge-success {
+            background-color: var(--success-color);
+            color: var(--bg-primary);
+        }
+
+        .badge-info {
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .alerts-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        /* Chart animations */
+        .chart-container canvas {
+            transition: var(--transition-normal);
+        }
+
+        .chart-container:hover canvas {
+            transform: scale(1.02);
+        }
+
+        /* Loading states */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-overlay);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius);
+            z-index: 10;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+            }
+            
+            .table-responsive {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</body>
+</html>
+

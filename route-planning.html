@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route Planning - Spectre Analytica</title>
+    <meta name="description" content="Advanced route planning with crime risk assessment for South Africa. Calculate safest routes and generate detailed risk reports.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="assets/css/main.css">
+    
+    <!-- Cesium Ion -->
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.110/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.110/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    
+    <!-- External Libraries -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="assets/images/logo.png" alt="Spectre Analytica Logo" class="logo">
+                <div class="brand-text">
+                    <h1 class="brand-name">Spectre Analytica</h1>
+                    <p class="brand-tagline">Engineering Tomorrow's Intelligence Today</p>
+                </div>
+            </div>
+            
+            <nav class="navigation">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i data-lucide="bar-chart-3"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="crime-map.html" class="nav-link">
+                            <i data-lucide="map"></i>
+                            Crime Map
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="route-planning.html" class="nav-link active">
+                            <i data-lucide="route"></i>
+                            Route Planning
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container-fluid">
+            <!-- Page Header -->
+            <div class="page-header mb-2">
+                <h2>Safe Route Planning</h2>
+                <p class="text-secondary">Calculate optimal routes with comprehensive crime risk assessment</p>
+            </div>
+
+            <div class="route-planning-layout">
+                <!-- Route Configuration Panel -->
+                <div class="route-config-panel">
+                    <div class="config-section">
+                        <h3>Route Configuration</h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i data-lucide="map-pin"></i>
+                                Travel From
+                            </label>
+                            <input type="text" class="form-input" id="travelFrom" placeholder="Enter starting location">
+                            <button class="location-btn" onclick="getCurrentLocation('from')">
+                                <i data-lucide="crosshair"></i>
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i data-lucide="flag"></i>
+                                Travel To
+                            </label>
+                            <input type="text" class="form-input" id="travelTo" placeholder="Enter destination">
+                            <button class="location-btn" onclick="getCurrentLocation('to')">
+                                <i data-lucide="crosshair"></i>
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i data-lucide="shield"></i>
+                                Threat Radius (km)
+                            </label>
+                            <div class="range-input">
+                                <input type="range" min="0.5" max="10" value="2" step="0.5" class="slider" id="threatRadius" onchange="updateThreatRadius()">
+                                <div class="range-display">
+                                    <span id="threatRadiusValue">2.0</span> km
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i data-lucide="user"></i>
+                                Profession
+                            </label>
+                            <select class="form-select" id="profession">
+                                <option value="general">General Public</option>
+                                <option value="business">Business Executive</option>
+                                <option value="tourist">Tourist</option>
+                                <option value="government">Government Official</option>
+                                <option value="media">Media Personnel</option>
+                                <option value="healthcare">Healthcare Worker</option>
+                                <option value="education">Education Professional</option>
+                                <option value="security">Security Personnel</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i data-lucide="clock"></i>
+                                    Travel Time
+                                </label>
+                                <select class="form-select" id="travelTime">
+                                    <option value="now">Now</option>
+                                    <option value="morning">Morning (6-9 AM)</option>
+                                    <option value="midday">Midday (12-2 PM)</option>
+                                    <option value="evening">Evening (5-7 PM)</option>
+                                    <option value="night">Night (8 PM-5 AM)</option>
+                                    <option value="custom">Custom Time</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i data-lucide="car"></i>
+                                    Vehicle Type
+                                </label>
+                                <select class="form-select" id="vehicleType">
+                                    <option value="car">Personal Car</option>
+                                    <option value="taxi">Taxi</option>
+                                    <option value="uber">Ride Share</option>
+                                    <option value="bus">Public Bus</option>
+                                    <option value="walking">Walking</option>
+                                    <option value="motorcycle">Motorcycle</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i data-lucide="settings"></i>
+                                Route Preferences
+                            </label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" checked>
+                                    <span class="checkmark"></span>
+                                    Avoid high-crime areas
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" checked>
+                                    <span class="checkmark"></span>
+                                    Prefer main roads
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox">
+                                    <span class="checkmark"></span>
+                                    Fastest route
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox">
+                                    <span class="checkmark"></span>
+                                    Toll roads allowed
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary btn-lg" onclick="calculateRoute()">
+                                <i data-lucide="route"></i>
+                                Calculate Safest Route
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearRoute()">
+                                <i data-lucide="x"></i>
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Route Results -->
+                    <div class="route-results" id="routeResults" style="display: none;">
+                        <h3>Route Analysis</h3>
+                        
+                        <div class="route-summary">
+                            <div class="summary-item">
+                                <i data-lucide="clock"></i>
+                                <div>
+                                    <span class="summary-value" id="routeDuration">-</span>
+                                    <span class="summary-label">Estimated Time</span>
+                                </div>
+                            </div>
+                            <div class="summary-item">
+                                <i data-lucide="map"></i>
+                                <div>
+                                    <span class="summary-value" id="routeDistance">-</span>
+                                    <span class="summary-label">Distance</span>
+                                </div>
+                            </div>
+                            <div class="summary-item">
+                                <i data-lucide="shield-alert"></i>
+                                <div>
+                                    <span class="summary-value" id="riskLevel">-</span>
+                                    <span class="summary-label">Risk Level</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="risk-breakdown">
+                            <h4>Risk Assessment</h4>
+                            <div class="risk-chart">
+                                <canvas id="riskChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="route-warnings" id="routeWarnings">
+                            <!-- Dynamic warnings will be inserted here -->
+                        </div>
+
+                        <div class="alternative-routes">
+                            <h4>Alternative Routes</h4>
+                            <div class="route-options" id="routeOptions">
+                                <!-- Alternative routes will be listed here -->
+                            </div>
+                        </div>
+
+                        <div class="export-options">
+                            <button class="btn btn-success" onclick="exportReport()">
+                                <i data-lucide="file-text"></i>
+                                Export PDF Report
+                            </button>
+                            <button class="btn btn-outline" onclick="shareRoute()">
+                                <i data-lucide="share"></i>
+                                Share Route
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Map Container -->
+                <div class="route-map-container">
+                    <div id="routeMapContainer" class="route-map"></div>
+                    
+                    <!-- Map Controls -->
+                    <div class="route-map-controls">
+                        <button class="map-control-btn" onclick="toggleMapView()" title="Toggle 2D/3D">
+                            <i data-lucide="layers"></i>
+                        </button>
+                        <button class="map-control-btn" onclick="centerOnRoute()" title="Center on Route">
+                            <i data-lucide="crosshair"></i>
+                        </button>
+                        <button class="map-control-btn" onclick="toggleTraffic()" title="Toggle Traffic">
+                            <i data-lucide="car"></i>
+                        </button>
+                        <button class="map-control-btn" onclick="toggleIncidents()" title="Toggle Crime Incidents">
+                            <i data-lucide="alert-triangle"></i>
+                        </button>
+                    </div>
+
+                    <!-- Route Progress -->
+                    <div class="route-progress" id="routeProgress" style="display: none;">
+                        <div class="progress-header">
+                            <h4>Route Navigation</h4>
+                            <button class="btn-close" onclick="stopNavigation()">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                        <div class="progress-content">
+                            <div class="current-step">
+                                <div class="step-instruction" id="currentInstruction">
+                                    Starting route calculation...
+                                </div>
+                                <div class="step-distance" id="stepDistance">
+                                    Preparing navigation
+                                </div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                            </div>
+                            <div class="eta-info">
+                                <span>ETA: <span id="etaTime">Calculating...</span></span>
+                                <span>Remaining: <span id="remainingDistance">-</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="assets/js/route-planning.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+        
+        // Initialize route planning
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeRoutePlanning();
+        });
+    </script>
+
+    <style>
+        /* Route Planning Specific Styles */
+        .container-fluid {
+            max-width: none;
+            padding: 0;
+        }
+
+        .page-header {
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .route-planning-layout {
+            display: flex;
+            height: calc(100vh - 140px);
+            gap: 0;
+        }
+
+        /* Configuration Panel */
+        .route-config-panel {
+            width: 400px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .config-section {
+            padding: 2rem;
+        }
+
+        .config-section h3 {
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .location-btn {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent-color);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.5rem;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition-normal);
+        }
+
+        .location-btn:hover {
+            background: var(--highlight-color);
+        }
+
+        .range-input {
+            position: relative;
+        }
+
+        .range-display {
+            text-align: center;
+            margin-top: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-lg {
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        /* Route Results */
+        .route-results {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .route-results h3 {
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+        }
+
+        .route-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+        }
+
+        .summary-item i {
+            color: var(--highlight-color);
+            width: 20px;
+            height: 20px;
+        }
+
+        .summary-value {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .summary-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .risk-breakdown {
+            margin-bottom: 2rem;
+        }
+
+        .risk-breakdown h4 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .risk-chart {
+            height: 200px;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+        }
+
+        .route-warnings {
+            margin-bottom: 2rem;
+        }
+
+        .warning-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid var(--warning-color);
+            border-radius: var(--border-radius);
+            margin-bottom: 0.5rem;
+        }
+
+        .warning-item i {
+            color: var(--warning-color);
+            margin-top: 0.2rem;
+        }
+
+        .alternative-routes {
+            margin-bottom: 2rem;
+        }
+
+        .alternative-routes h4 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .route-option {
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            border: 2px solid transparent;
+        }
+
+        .route-option:hover {
+            border-color: var(--accent-color);
+        }
+
+        .route-option.selected {
+            border-color: var(--highlight-color);
+            background: rgba(233, 69, 96, 0.1);
+        }
+
+        .option-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .option-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .option-risk {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--border-radius);
+        }
+
+        .risk-low { background: var(--success-color); color: var(--bg-primary); }
+        .risk-medium { background: var(--warning-color); color: var(--bg-primary); }
+        .risk-high { background: var(--danger-color); color: white; }
+
+        .option-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .export-options {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Map Container */
+        .route-map-container {
+            flex: 1;
+            position: relative;
+            background: var(--bg-secondary);
+        }
+
+        .route-map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Map Controls */
+        .route-map-controls {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 1000;
+        }
+
+        .map-control-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-overlay);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-normal);
+        }
+
+        .map-control-btn:hover {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        /* Route Progress */
+        .route-progress {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            background: var(--bg-card);
+            backdrop-filter: blur(15px);
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-xl);
+            z-index: 1000;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .progress-header h4 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .progress-content {
+            padding: 1rem;
+        }
+
+        .current-step {
+            margin-bottom: 1rem;
+        }
+
+        .step-instruction {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-distance {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-accent);
+            transition: width 0.3s ease;
+        }
+
+        .eta-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .route-planning-layout {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .route-config-panel {
+                width: 100%;
+                max-height: 60vh;
+            }
+            
+            .route-map-container {
+                height: 40vh;
+                min-height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .config-section {
+                padding: 1rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .route-summary {
+                gap: 0.5rem;
+            }
+            
+            .summary-item {
+                padding: 0.75rem;
+            }
+            
+            .export-options {
+                flex-direction: column;
+            }
+            
+            .route-progress {
+                left: 0.5rem;
+                right: 0.5rem;
+                bottom: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .route-map-controls {
+                top: 0.5rem;
+                right: 0.5rem;
+            }
+            
+            .map-control-btn {
+                width: 36px;
+                height: 36px;
+            }
+        }
+    </style>
+</body>
+</html>
+
